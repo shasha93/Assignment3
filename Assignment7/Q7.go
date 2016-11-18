@@ -7,7 +7,19 @@ import(
        
       )
 
-func HandleRequest(conn net.Conn,myChan chan error){
+func ChatResponse(msg string)string{
+  var reqBuf string 
+  switch strings.ToLower(msg) {
+    case "hello": reqBuf="hi"
+    case "name": reqBuf="Chitty"
+    case "goodbye" :reqBuf="Bye"
+    default: reqBuf="I am Busy"
+
+    } 
+  return reqBuf
+}
+
+func HandleRequest(conn net.Conn,myChan chan error){  //,myChan chan error
  for{
   buf := make([]byte, 1024)
 
@@ -16,15 +28,10 @@ func HandleRequest(conn net.Conn,myChan chan error){
     myChan<-err
     return 
   }
-  var reqBuf string
-  fmt.Print("Message Received:", string(buf[:totLen-2])+"\n")
-switch strings.ToLower(string(buf[:totLen-2])) {
-    case "hello": reqBuf="hi"
-    case "name": reqBuf="Chitty"
-    case "goodbye" :reqBuf="Bye"
-    default: reqBuf="I am Busy"
-
-    }  
+  msg:=string(buf[:totLen-2])
+  fmt.Print("Message Received:", msg+"\n")
+ 
+   reqBuf:=ChatResponse(msg)
 
   _,err= conn.Write([]byte("new message :"+reqBuf+"\n"))
     if err != nil {
@@ -38,19 +45,20 @@ switch strings.ToLower(string(buf[:totLen-2])) {
 func Server(port string)error{
  ln,err:= net.Listen("tcp",port)
   if err!=nil{
-  return err
+   return err
 }
   defer ln.Close()
- myChan:=make(chan error)
+    myChan:=make(chan error)
  for{
    con,err:=ln.Accept()
    if err!=nil{
-     return err
+      return err
   }
     
-   go HandleRequest(con,myChan)
+   go HandleRequest(con,myChan) 
   err=<-myChan
  if err!=nil{
+   panic(err)
    return err
   
  }

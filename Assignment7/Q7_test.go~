@@ -1,3 +1,4 @@
+
 package main
 
 import (
@@ -6,6 +7,7 @@ import (
           "time"
            "fmt"
            "net"
+           "reflect"
          )
 
 
@@ -111,4 +113,35 @@ func TestWrongServers(t *testing.T){
    }
   
   }
+
+func TestChatResponse(t *testing.T){
+
+    words:=[]string{"Hello","Name","GoodBye","wait"}
+    expectedOutput:=[]string{"hi","Chitty","Bye","I am Busy"}
+   recieve:=make([]string,0,len(words))
+    for _,word:=range words{
+            msg:=ChatResponse(word)
+     recieve=append(recieve,msg)
+  }
+   if reflect.DeepEqual(recieve,expectedOutput)!=true{
+    t.Fatalf("wrong message error found",errors.New("This is the final test"))
+   }
+    
+}
+
+func TestWrongChatResponse(t *testing.T){
+
+    words:=[]string{"Hello","Name","GoodBye","wait"}
+    expectedOutput:=[]string{"hi","Bitto","Bye","I am Busy"}
+   recieve:=make([]string,0,len(words))
+    for _,word:=range words{
+            msg:=ChatResponse(word)
+     recieve=append(recieve,msg)
+  }
+   if reflect.DeepEqual(recieve,expectedOutput)==true{
+    t.Fatalf("wrong output case message  error found",errors.New("This is the final test"))
+   }
+    
+}
+
 
